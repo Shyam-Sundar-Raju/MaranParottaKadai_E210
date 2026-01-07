@@ -63,32 +63,81 @@ exports.askQuestion = async (req, res) => {
 
     // Build prompt (Gemini likes one text block)
     const prompt = `
-    You are an educational assistant.
-    Answer ONLY using the syllabus content below.
-    If the answer is not present, say "This is not covered in the syllabus."
+    You are a Content Architect generating a draft educational explanation.
 
-    SYLLABUS:
-    ${topChunks.join("\n\n")}
+Use the syllabus content provided as your primary source.
+If the syllabus does not clearly contain the answer, state that explicitly.
 
-    QUESTION:
-    ${question}
+Do not add external facts or examples beyond the syllabus.
+
+SYLLABUS:
+${topChunks.join("\n\n")}
+
+QUESTION:
+${question}
     `;
 
     const result = await model.generateContent(prompt);
-    const finalAnswer = result.response.text();
+    const draft = {
+        agent: "Content Architect",
+        content: result.response.text()
+      };
+
+      const watchdogPrompt = `
+      You are a strict curriculum watchdog.
+      
+      TASK:
+      Check whether the ANSWER below strictly adheres to the SYLLABUS.
+      Do NOT add new information.
+      Do NOT rewrite the answer.
+      
+      If the answer contains content not supported by the syllabus, mark FAIL.
+      
+      Respond ONLY in JSON with this format:
+      {
+        "status": "PASS" or "FAIL",
+        "issues": ["issue1", "issue2"]
+      }
+      
+      SYLLABUS:
+      ${topChunks.join("\n\n")}
+      
+      ANSWER:
+      ${draft.content}
+      `;
+      
+      // const watchdogResult = await model.generateContent(watchdogPrompt);
+      // let watchdogVerdict;
+
+        // try {
+        // watchdogVerdict = JSON.parse(watchdogResult.response.text());
+        // } catch (e) {
+        // watchdogVerdict = {
+        //     status: "FAIL",
+        //     issues: ["Watchdog output could not be parsed"]
+        // };
+        // }
+
+        // console.log("Curriculum Watchdog:", watchdogVerdict);
+
 
     // Save assistant message
     await Message.create({
         projectId,
         role: "assistant",
-        content: finalAnswer
-  });
+        content: draft.content
+      });
+      
   
 
-    res.json({
-    answer: finalAnswer,
-    usedChunks: topChunks.length
-    });
+      res.json({
+        answer: draft.content,
+        usedChunks: topChunks.length,
+        agent: draft.agent,
+        // curriculumCheck: watchdogVerdict.status
+      });
+      
+      
 
   
 

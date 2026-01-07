@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const transporter = require("../utils/mailer");
+const crypto = require("crypto");
 
 // REGISTER
 exports.register = async (req, res) => {
@@ -73,3 +75,40 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // 1. Generate new password
+    const newPassword = crypto.randomBytes(6).toString("hex");
+
+    // 2. Hash it
+    const newPasswordHash = await bcrypt.hash(newPassword, 10);
+
+    // 3. Update DB
+    user.passwordHash = newPasswordHash;
+    await user.save();
+
+    // 4. Send email
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Your New Password",
+      text: `Your new password is: ${newPassword}`
+    });
+
+    res.json({ message: "New password sent to your email" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Forgot password failed" });
+  }
+};
+
