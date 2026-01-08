@@ -5,11 +5,13 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { api } from "../../lib/api";
 
-// 1. Receive onNewChat here 👇
 export default function Sidebar({ activeProject, onSelectProject, onNewChat }) {
   const [projects, setProjects] = useState([]);
   const [isCreating, setIsCreating] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
+  
+  // 🆕 State for Level Selection
+  const [newProjectLevel, setNewProjectLevel] = useState("Beginner");
 
   useEffect(() => {
     fetchProjects();
@@ -27,10 +29,16 @@ export default function Sidebar({ activeProject, onSelectProject, onNewChat }) {
   const handleCreateProject = async () => {
     if (!newProjectName.trim()) return;
     try {
-      await api.post("/projects", { name: newProjectName, level: "Beginner" });
+      // 🚀 Send Name AND Level to Backend
+      await api.post("/projects", { 
+        name: newProjectName, 
+        level: newProjectLevel 
+      });
+      
       setNewProjectName("");
+      setNewProjectLevel("Beginner"); // Reset to default
       setIsCreating(false);
-      fetchProjects();
+      fetchProjects(); 
     } catch (err) {
       alert("Failed to create project");
     }
@@ -39,7 +47,7 @@ export default function Sidebar({ activeProject, onSelectProject, onNewChat }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <img src="/logo.jpeg" alt="Consensus Logo" className="w-8 h-8 rounded" />
+        <img src="/logo.jpeg" alt="Logo" className="sidebar-logo" />
         <span>Consensus</span>
       </div>
 
@@ -53,20 +61,33 @@ export default function Sidebar({ activeProject, onSelectProject, onNewChat }) {
             isActive={activeProject?._id === proj._id}
             onClick={() => onSelectProject(proj)}
             onRefresh={fetchProjects}
-            onNewChat={onNewChat} // 2. Pass it down here 👇
+            onNewChat={onNewChat}
           />
         ))}
 
+        {/* 🆕 CREATE PROJECT FORM */}
         {isCreating && (
-          <div className="p-2 border border-blue-100 rounded bg-blue-50 m-2">
+          <div className="create-project-form">
             <Input 
               placeholder="Project Name..." 
               value={newProjectName}
               onChange={(e) => setNewProjectName(e.target.value)}
               className="mb-2 h-8 bg-white"
             />
+            
+            {/* 🔽 Level Dropdown */}
+            <select 
+              className="select-field mb-2"
+              value={newProjectLevel}
+              onChange={(e) => setNewProjectLevel(e.target.value)}
+            >
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+
             <div className="flex gap-2">
-              <Button size="sm" onClick={handleCreateProject} className="h-7 text-xs">Create</Button>
+              <Button size="sm" onClick={handleCreateProject} className="h-7 text-xs flex-1">Create</Button>
               <Button size="sm" variant="ghost" onClick={() => setIsCreating(false)} className="h-7 text-xs">Cancel</Button>
             </div>
           </div>
