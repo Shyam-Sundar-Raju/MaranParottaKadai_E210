@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import ChatInput from "./ChatInput";
 import MessageBubble from "./MessageBubble";
+import ThinkingIndicator from "./ThinkingIndicator"; // 👈 Import the new component
 import { api } from "../../lib/api";
 
 export default function ChatWindow({ activeProject }) {
@@ -120,12 +121,8 @@ export default function ChatWindow({ activeProject }) {
           <MessageBubble key={idx} text={msg.text} isUser={msg.isUser} />
         ))}
 
-        {/* Loading Indicator for New Message */}
-        {loading && (
-          <div className="message-wrapper bot">
-            <div className="chat-bubble bot italic text-gray-400">Thinking...</div>
-          </div>
-        )}
+        {/* 👇 UPDATED: Uses the ThinkingIndicator component */}
+        {loading && <ThinkingIndicator />}
         
         {/* Invisible element to scroll to */}
         <div ref={messagesEndRef} />
