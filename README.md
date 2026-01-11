@@ -147,3 +147,24 @@ We adapt this concept to the **education domain**, emphasizing curriculum alignm
 Built during a **24-hour hackathon** by a team of two, focusing on **correctness, explainability, and educational impact**.
 
 ---
+
+## Deployment Note
+
+The Python embedding microservice (SentenceTransformers + PyTorch) couldn't deployed on free-tier hosting platforms due to strict memory limits (512 MB on Render Free).
+
+During testing, the service consistently exceeded available memory during model initialization. This is a known limitation when running transformer-based embedding models without GPU or increased RAM.
+
+### Recommended Production Setup
+- Deploy the embedding service on a higher-memory instance (≥1 GB RAM), or
+- Replace local embeddings with a hosted embedding API (e.g., OpenAI / Together AI), which integrates seamlessly with the existing architecture.
+
+---
+
+### Local Execution
+The full system, including the embedding service, runs correctly in a local environment.
+
+<img width="1468" height="876" alt="image" src="https://github.com/user-attachments/assets/cf705d90-6003-434d-be55-2d8d500630d0" />
+<img width="1312" height="359" alt="image" src="https://github.com/user-attachments/assets/71e3b4de-6ebc-4e30-91d4-2a66d7ef424f" />
+
+
+
