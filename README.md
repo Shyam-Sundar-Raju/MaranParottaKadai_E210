@@ -30,6 +30,8 @@ Existing LLMs optimize for fluency, not for **correctness, curriculum alignment,
 
 ## 💡 Proposed Solution: LLM Council Architecture
 
+<img width="419" height="165" alt="image" src="https://github.com/user-attachments/assets/5f7c4a14-9023-4333-b67a-a9e79645555b" />
+
 We introduce an **Adversarial Multi-Agent System** inspired by academic peer review.
 
 Instead of a single AI monologue, content passes through a **Council of Specialized LLM Agents**, each responsible for enforcing a specific educational constraint.
@@ -75,7 +77,8 @@ This pipeline **mechanically reduces hallucinations** and enforces pedagogical c
 
 ## 🧱 Architecture Diagram
 
-<img width="856" height="402" alt="image" src="https://github.com/user-attachments/assets/d54f271c-4d18-4e78-81f0-c768e7e92ee7" />
+<img width="1155" height="432" alt="image" src="https://github.com/user-attachments/assets/7a977cbb-ddc3-4db3-87d2-911ae81c104e" />
+
 
 
 ---
